@@ -1,9 +1,9 @@
 use eframe::App;
+use egui::Visuals;
 
 use crate::pages::index::Index;
 use crate::pages::login::Login;
 use crate::{NMessage, NPage};
-use egui::{Align, CentralPanel, Layout, ScrollArea, SidePanel, Visuals, WidgetText};
 use flume::{Receiver, Sender};
 
 pub struct NGas {
