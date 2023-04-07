@@ -1,5 +1,5 @@
 use crate::pages::common::{side_panel, top_panel};
-use crate::{NMessage, NPage};
+use crate::NMessage;
 use eframe::{App, Frame};
 use egui::{CentralPanel, Context};
 use flume::Sender;

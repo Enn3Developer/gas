@@ -1,8 +1,7 @@
 use crate::pages::common::{side_panel, top_panel};
-use crate::widgets::hamburger;
-use crate::{NMessage, NPage};
+use crate::NMessage;
 use eframe::{App, Frame};
-use egui::{Align, CentralPanel, Context, Direction, Layout, ScrollArea, SidePanel, WidgetText};
+use egui::{CentralPanel, Context, ScrollArea};
 use flume::Sender;
 
 pub struct Index {
