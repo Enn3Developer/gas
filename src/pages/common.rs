@@ -1,6 +1,6 @@
 use crate::widgets::hamburger;
 use crate::{NMessage, NPage};
-use egui::{Align, Context, Layout, SidePanel, Ui, WidgetText};
+use egui::{Align, Context, Label, Layout, SidePanel, Ui, WidgetText};
 use flume::Sender;
 
 pub fn top_panel(ui: &mut Ui, title: &str, show_panel: &mut bool) {
@@ -15,6 +15,7 @@ pub fn top_panel(ui: &mut Ui, title: &str, show_panel: &mut bool) {
         });
     });
     ui.separator();
+    ui.add_space(10.0);
 }
 
 pub fn side_panel(ctx: &Context, tx: Sender<NMessage>, show_panel: bool) {
