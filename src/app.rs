@@ -1,51 +1,50 @@
-use crate::widgets::{hamburger, toggle};
-use egui::panel::Side;
-use egui::{
-    Align, CentralPanel, CollapsingHeader, Id, Layout, ScrollArea, SidePanel, Visuals, WidgetText,
-};
+use eframe::App;
 
-pub struct TemplateApp {
-    show_panel: bool,
+use crate::pages::index::Index;
+use crate::pages::login::Login;
+use crate::{NMessage, NPage};
+use egui::{Align, CentralPanel, Layout, ScrollArea, SidePanel, Visuals, WidgetText};
+use flume::{Receiver, Sender};
+
+pub struct NGas {
+    current_page: Box<dyn App>,
+    rx: Receiver<NMessage>,
+    tx: Sender<NMessage>,
 }
 
-impl Default for TemplateApp {
-    fn default() -> Self {
-        Self { show_panel: false }
-    }
-}
-
-impl TemplateApp {
+impl NGas {
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         cc.egui_ctx.set_visuals(Visuals::dark());
 
-        Default::default()
+        let (tx, rx) = flume::unbounded();
+
+        let index = Index::new(tx.clone());
+
+        Self {
+            rx,
+            tx,
+            current_page: Box::new(index),
+        }
     }
 }
 
-impl eframe::App for TemplateApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        if self.show_panel {
-            SidePanel::left("left_panel").show(ctx, |ui| {
-                ui.selectable_label(false, WidgetText::from("Login").heading());
-            });
+impl App for NGas {
+    fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+        self.current_page.update(ctx, frame);
+
+        while let Ok(message) = self.rx.try_recv() {
+            match message {
+                NMessage::Redirect(page) => match page {
+                    NPage::Index => {
+                        let index = Index::new(self.tx.clone());
+                        self.current_page = Box::new(index);
+                    }
+                    NPage::Login => {
+                        let login = Login::new(self.tx.clone());
+                        self.current_page = Box::new(login);
+                    }
+                },
+            }
         }
-
-        CentralPanel::default().show(ctx, |ui| {
-            // Top panel
-            ui.horizontal_top(|ui| {
-                ui.add(hamburger(&mut self.show_panel));
-                ui.add_space(10.0);
-                egui::warn_if_debug_build(ui);
-                ui.with_layout(Layout::right_to_left(Align::TOP), |ui| {
-                    ui.heading("GAS");
-                });
-            });
-            ui.separator();
-
-            // Main page
-            ScrollArea::vertical().show(ui, |ui| {
-                ui.label("Test");
-            });
-        });
     }
 }
